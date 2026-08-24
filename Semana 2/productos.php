@@ -5,8 +5,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            const responseAPI = {
+                "status" : 200,
+                "message" : "Productos obtenidos correctamente",
+                "data" : [{"id" : "1", "nombre" : "Pelota"}, {"id" : "2", "nombre" : "Bate"}, {"id" : "3", "nombre" : "Zapatillas"}]
+
+            }
+            function cargarProducto() {
+                let cmb = document.getElementById("cmbProducto");
+                responseAPI.data.forEach(producto => {
+                    let opt = document.createElement("option");
+                    opt.setAttribute("value", producto.id);
+                    opt.innerText = producto.nombre;
+                    cmb.appendChild(opt);
+                });
+            }
+        </script>
     </head>
-    <body>
+    <body onload="cargarProducto()">
         <!--Estructura básica-->
         <!--Navbar -->
         <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
@@ -39,6 +56,10 @@
                 </div>
             </div>
         </nav>
+        <div>
+            <select id="cmbProducto" name="cmbProducto"></select>
+        </div>
+
         <!--Conteiner -->
         <div class="container-fluid bg-warning">
             <a href="index.php">Página Principal</a><br>

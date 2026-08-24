@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            const responseAPI = {
+                "status" : 200,
+                "message" : "Productos obtenidos correctamente",
+                "data" : [{"id" : "1", "nombre" : "Pelota"}, {"id" : "2", "nombre" : "Bate"}, {"id" : "3", "nombre" : "Zapatillas"}]
+
+            }
+            function cargarProducto() {
+                let cmb = document.getElementById("cmbProducto");
+                responseAPI.data.forEach(producto => {
+                    let opt = document.createElement("option");
+                    opt.setAttribute("value", producto.id);
+                    opt.innerText = producto.nombre;
+                    cmb.appendChild(opt);
+                });
+            }
+        </script>
+    </head>
+    <body onload="cargarProducto();">
+        <div>
+            <select id="cmbProducto" name="cmbProducto"></select>
+        </div>
+    </body>
+</html>
