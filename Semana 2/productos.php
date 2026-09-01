@@ -61,12 +61,7 @@
         </div>
 
         <!--Conteiner -->
-        <div class="container-fluid bg-warning">
-            <a href="index.php">Página Principal</a><br>
-            <a href="empresa.php">Empresa</a><br>
-            <a href="servicios.php">Servicios</a><br>
-            <a href="contacto.php">Contacto</a><br>
-        </div>
+        
         <!--Footer-->
         <div class="container-fluid bg-danger">
             <div class="row">
