@@ -1,0 +1,29 @@
+{
+  "name": "entrega-1-desarrollo-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MirelaRivero/entrega-1-desarrollo-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-express": "^3.13.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "graphql": "15",
+    "mongoose": "8.17.1"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MirelaRivero/entrega-1-desarrollo-web/issues"
+  },
+  "homepage": "https://github.com/MirelaRivero/entrega-1-desarrollo-web#readme"
+}
