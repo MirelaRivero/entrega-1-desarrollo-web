@@ -22,12 +22,13 @@
                 <div class="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="a" role="button" data-bs-toggle="dropdown">Productos</a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Productos</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="a">Mieles</a></li>
-                                <li><a class="dropdown-item" href="a">Packs</a></li>
-                                <li><a class="dropdown-item" href="a">Derivados</a></li>
-                                <li><a class="dropdown-item" href="productos.php">Todo</a></li>
+                                <li><a class="dropdown-item" href="productos.php?categoria=mieles">Mieles</a></li>
+                                <li><a class="dropdown-item" href="productos.php?categoria=packs">Packs</a></li>
+                                <li><a class="dropdown-item" href="productos.php?categoria=derivados">Derivados</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="productos.php?">Todo</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">

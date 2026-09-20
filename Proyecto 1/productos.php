@@ -23,12 +23,13 @@
                 <div class="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="a" role="button" data-bs-toggle="dropdown">Productos</a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Productos</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="a">Mieles</a></li>
-                                <li><a class="dropdown-item" href="a">Packs</a></li>
-                                <li><a class="dropdown-item" href="a">Derivados</a></li>
-                                <li><a class="dropdown-item" href="a">Todo</a></li>
+                                <li><a class="dropdown-item" href="productos.php?categoria=mieles">Mieles</a></li>
+                                <li><a class="dropdown-item" href="productos.php?categoria=packs">Packs</a></li>
+                                <li><a class="dropdown-item" href="productos.php?categoria=derivados">Derivados</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="productos.php?">Todo</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -57,9 +58,11 @@
                 "status": 200,
                 "message": "Productos obtenidos exitosamente",
                 "data": [
+                    // MIELES
                     {
                     "id": 1,
                     "nombre": "Miel de Ulmo",
+                    "categoria": "mieles",
                     "precio": "$6.500",
                     "descripcion": "Aroma floral pronunciado y textura cremosa única.",
                     "imagen": "img/mieles/miel1.png"
@@ -67,6 +70,7 @@
                     {
                     "id": 2,
                     "nombre": "Miel Multifloral",
+                    "categoria": "mieles",
                     "precio": "$5.900",
                     "descripcion": "Proveniente del bosque nativo, suave y balanceada.",
                     "imagen": "img/mieles/miel2.png"
@@ -74,6 +78,7 @@
                     {
                     "id": 3,
                     "nombre": "Miel de Quillay",
+                    "categoria": "mieles",
                     "precio": "$6.200",
                     "descripcion": "Sabor ambarino intenso, ideal para endulzar infusiones.",
                     "imagen": "img/mieles/miel3.png"
@@ -81,17 +86,69 @@
                     {
                     "id": 4,
                     "nombre": "Miel de Propóleo",
+                    "categoria": "mieles",
                     "precio": "$7.000",
                     "descripcion": "Concentrado natural con propiedades antibacterianas.",
                     "imagen": "img/mieles/miel4.png"
                     },
+                    //PACKS
+                    {
+                    "id": 5,
+                    "nombre": "Pack Degustación 3 Mieles",
+                    "categoria": "packs",
+                    "precio": "$15.990",
+                    "descripcion": "Incluye frascos de Multiforal, Quillay y Propóleo.",
+                    "imagen": "img/packs/pack1.png"
+                    },
+                    // Derivados
+                    {
+                    "id": 6,
+                    "nombre": "Propóleo en Gotas 30ml",
+                    "categoria": "derivados",
+                    "precio": "$4.500",
+                    "descripcion": "Tintura de propóleo natural para reforzar defensas.",
+                    "imagen": "img/derivados/propo1.png"
+                    },
+                    {
+                    "id": 7,
+                    "nombre": "Polen Granulado 250g",
+                    "categoria": "derivados",
+                    "precio": "$5.200",
+                    "descripcion": "Superalimento energizantes cosechado artesanalmente.",
+                    "imagen": "img/derivados/polen1.png"
+                    }
                 ]
             };
 
             function cargarTarjetas() {
                 const contenedor = document.getElementById("contenedorProductos");
+                contenedor.innerHTML = "";
+                
+                // Leemos el parametro de categoria
+                const urlParams = new URLSearchParams(window.location.search);
+                const catSeleccionada = urlParams.get('categoria') || 'todos';
 
-                responseAPI.data.forEach(prod => {
+                // Cambiamos el titulo de la pagina
+                const titulo = document.querySelector("h2.text-center");
+                if (titulo) {
+                    if (catSeleccionada === "mieles") titulo.innerText = "Nuestras Mieles";
+                    else if (catSeleccionada === "packs") titulo.innerText = "Packs Promocionales";
+                    else if (catSeleccionada === "derivados") titulo.innerText = "Derivados de la Miel";
+                    else titulo.innerText = "Todos Nuestros Productos";
+                }
+
+                // Filtramos los productos por categoria
+                const productosFiltrados = (catSeleccionada === 'todos')
+                    ? responseAPI.data
+                    : responseAPI.data.filter(p => p.categoria === catSeleccionada);
+
+                // Renderizar las tarjetas filtradas
+                if (productosFiltrados.length === 0) {
+                    contenedor.innerHTML = '<div class="col-12 text-center text-muted"><p>No hay productos disponibles para esta sección por el momento.<p></div>';
+                    return;
+                }
+
+                productosFiltrados.forEach(prod => {
                     const col = document.createElement("div");
                     col.className = "col-12 col-sm-6 col-lg-3";
 

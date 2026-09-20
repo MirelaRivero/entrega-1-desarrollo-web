@@ -59,6 +59,14 @@
     color: #ffffff;
 }
 
+/*Altura para todas las imagenes de tarjetas*/
+.card-img-top {
+    height: 220px;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
 
 
 
