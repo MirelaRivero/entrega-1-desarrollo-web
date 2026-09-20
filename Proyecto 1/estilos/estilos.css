@@ -1,0 +1,65 @@
+/*NavBar*/
+.navbar {
+    background-color: rgb(233, 184, 49) !important;
+}
+
+/*Logo de la empresa*/
+.navbar-brand {
+    color: rgb(0, 0, 0) !important;
+    font-weight: 700;
+}
+
+/*Paginas*/
+.navbar .nav-link {
+    color: #ffffff !important;
+    font-weight: 600;
+    transition: color 0.2s ease-in-out;
+}
+
+/*Color para cuando se pase el mouse por encima*/
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: #8c5300 !important;
+}
+
+/*Boton hamburguesa*/
+.navbar-toggler {
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/*Botones*/
+.btn-primary {
+    background-color: #f7ad0f !important;
+    border-color: #f7ad0f !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #d99305 !important;
+    border-color: #d99305 !important;
+    color: #ffffff;
+}
+
+/*Boton de acceso*/
+.btn-outline-primary {
+    color: #4a2c00 !important;
+    border-color: #4a2c00 !important;
+    font-weight: 600;
+}
+
+.btn-outline-primary:hover {
+    background-color: #4a2c00 !important;
+    border-color: #4a2c00 !important;
+    color: #ffffff;
+}
+
+
+
+
+
