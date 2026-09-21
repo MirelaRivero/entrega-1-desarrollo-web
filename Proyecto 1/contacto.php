@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="estilos/estilos.css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
         <script src="js/productos.js"></script>
+        <script src="js/carrito.js"></script>
     </head>
     <body>
         <!--Estructura básica-->
@@ -44,16 +45,19 @@
                         </li>
                     </ul>
                 </div>
-                <button type="button" class="btn border-0 bg-transparent p-0 position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
-                    <img src="img/carrito.png" style="width: 20px; height: 20px; object-fit: contain;">
-                    <!-- contador dinámico -->
-                    <span class="position-absolute top-0 start-100 translate-middle bagde rounded-pill bg-danger" id="contadorCarrito">
-                        0
-                    </span>
-                </button>
-                <button type="button" class="btn border-0 bg-transparent p-0" data-bs-toggle="modal" data-bs-target="#myModal">
-                    <img src="img/loginicon1.png" style="width: 20px; height: 20px; object-fit: contain;">
-                </button>
+                <!-- Envoltorio de los botones de login y carrito -->
+                <div class="d-flex align-items-center ms-auto">
+                    <button type="button" class="btn border-0 bg-transparent p-0 position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
+                        <img src="img/carrito.png" style="width: 20px; height: 20px; object-fit: contain;">
+                        <!-- contador dinámico -->
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorCarrito">
+                            0
+                        </span>
+                    </button>
+                    <button type="button" class="btn border-0 bg-transparent p-0" data-bs-toggle="modal" data-bs-target="#myModal">
+                        <img src="img/loginicon1.png" style="width: 20px; height: 20px; object-fit: contain;">
+                    </button>
+                </div>
             </div>
         </nav>
         <!--Conteiner -->
@@ -110,6 +114,7 @@
                 </div>
             </div>
         </div>
+        <!-- Panel lateral del carrito -->
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
             <div class="offcanvas-header bg-light border-bottom">
                 <h5 class="offcanvas-title fw-bold" id="offcanvasCarritoLabel">Carrito de Compras</h5>
@@ -117,7 +122,7 @@
             </div>
 
             <!-- Productos que se añaden -->
-            <div class="ofcanvas-body d-flex flex-column">
+            <div class="offcanvas-body d-flex flex-column">
                 <!-- Lista de productos -->
                 <div id="listaCarrito" class="flex-grow-1 overflow-auto">
                     <!-- si el carrito esta vacio se mostrara un mensaje -->
@@ -135,7 +140,7 @@
                     </div>
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-primary btn-lg" onclick="irAlCheckout()">
-                            Iniciar Compra
+                            Ir a pagar
                         </button>
                         <button type="button" class="btn btn-outline-danger btn-sm" onclick="vaciarCarrito()">
                             Vaciar Carrito

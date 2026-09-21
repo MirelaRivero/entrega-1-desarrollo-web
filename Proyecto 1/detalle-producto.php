@@ -1,30 +1,37 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Página Principal</title>
+        <title>Detalle del Producto</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="estilos/estilos.css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="js/productos.js"></script>
+        <script src="js/carrito.js"></script>
     </head>
-    <body>
+    <body onload="cargarDetalleProducto();">
         <!--Estructura básica-->
+        
         <!--Navbar -->
-        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <nav class="navbar navbar-expand-sm navbar-light">
             <div class="container-fluid">
-                <a class="navbar-brand" href="index.php">Logo</a>
+                <a class="navbar-brand" href="index.php">
+                    <img src="img/logoap1.png" alt="Avatar Logo" style="width: 180px;" class="logo-img">
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="a" role="button" data-bs-toggle="dropdown">Productos</a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Productos</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="a">Mieles</a></li>
-                                <li><a class="dropdown-item" href="a">Packs</a></li>
-                                <li><a class="dropdown-item" href="a">Derivados</a></li>
-                                <li><a class="dropdown-item" href="a">Todo</a></li>
+                                <li><a class="dropdown-item" href="productos.php?categoria=mieles">Mieles</a></li>
+                                <li><a class="dropdown-item" href="productos.php?categoria=packs">Packs</a></li>
+                                <li><a class="dropdown-item" href="productos.php?categoria=derivados">Derivados</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="productos.php?">Todo</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -38,99 +45,74 @@
                         </li>
                     </ul>
                 </div>
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#myModal">Acceso</button>
+                <!-- Envoltorio de los botones de login y carrito -->
+                <div class="d-flex align-items-center ms-auto">
+                    <button type="button" class="btn border-0 bg-transparent p-0 position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
+                        <img src="img/carrito.png" style="width: 20px; height: 20px; object-fit: contain;">
+                        <!-- contador dinámico -->
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contadorCarrito">
+                            0
+                        </span>
+                    </button>
+                    <button type="button" class="btn border-0 bg-transparent p-0" data-bs-toggle="modal" data-bs-target="#myModal">
+                        <img src="img/loginicon1.png" style="width: 20px; height: 20px; object-fit: contain;">
+                    </button>
+                </div>
             </div>
         </nav>
 
-        <!-- Cartas de contenido -->
+        <!-- Contenedor con el detalle de los productos -->
         <div class="container my-5">
-            <h2 class="text-center mb-4">Nuestros Productos Más Vendidos</h2>
-            <div class="row g-4">
-                <!-- Producto 1 -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 shadow-sm">
-                            <img src="img/mieles/miel1.png" class="card-img-top" alt="Miel 1">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Miel 1</h5>
-                                <p class="card-text">Descripción de la miel 1.</p>
-                                <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
-                            </div>
-                        </div>
-                </div>
-                <!-- Producto 2 -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 shadow-sm">
-                            <img src="img/mieles/miel2.png" class="card-img-top" alt="Miel 2">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Miel 2</h5>
-                                <p class="card-text">Descripción de la miel 2.</p>
-                                <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
-                            </div>
-                        </div>
-                </div>
-                <!-- Producto 3 -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 shadow-sm">
-                            <img src="img/mieles/miel3.png" class="card-img-top" alt="Miel 3">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Miel 3</h5>
-                                <p class="card-text">Descripción de la miel 3.</p>
-                                <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
-                            </div>
-                        </div>
-                </div>
-                <!-- Producto 4 -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 shadow-sm">
-                            <img src="img/mieles/miel4.png" class="card-img-top" alt="Miel 4">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Miel 4</h5>
-                                <p class="card-text">Descripción de la miel 4.</p>
-                                <a href="#" class="btn btn-primary mt-auto">Ver Más</a>
-                            </div>
-                        </div>
-                </div>    
+            <!-- Beadcrumbs de Bootstrap -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.php" class="text-decoration-none text-muted">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="productos.php" class="text-decoration-none text-muted">Productos</a></li>
+                    <li class="breadcrumb-item active text-warning fw-bold" id="migajaProducto" aria-current="page">Detalle</li>
+                </ol>
+            </nav>
+
+            <div class="row align-items-center g-5 mt-2" id="vistaDetalle">
+                <!-- Aca va la funcion de cargarDetalleProducto()-->
             </div>
         </div>
 
-        <!-- Carousel -->
-       <div class="container my-4">
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-12 col-lg-10">
-                    <div id="demo" class="carousel slide" data-bs-ride="carousel">
+        <!-- Off canvas carrito -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
+            <div class="offcanvas-header bg-light border-bottom">
+                <h5 class="offcanvas-title fw-bold" id="offcanvasCarritoLabel">Carrito de Compras</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
 
-                    <!-- Indicators/dots -->
-                    <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-                        <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-                        <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+            <!-- Productos que se añaden -->
+            <div class="offcanvas-body d-flex flex-column">
+                <!-- Lista de productos -->
+                <div id="listaCarrito" class="flex-grow-1 overflow-auto">
+                    <!-- si el carrito esta vacio se mostrara un mensaje -->
+                     <div class="text-center text-muted my-5" id="carritoVacio">
+                        <p class="fs-4">🍯</p>
+                        <small>Tu carrito está vacío</small>
+                     </div>
+                </div>
+
+                <!-- Contenido del carrito -->
+                <div class="border-top pt-3 mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fw-bold fs-5">Total a Pagar: </span>
+                        <span class="fw-bold fs-5 text-warning" id="precioTotalCarrito">$0</span>
                     </div>
-
-                    <!-- The slideshow/carousel -->
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                        <img src="img/apiarios/ap1.jpg" alt="Apiario 1" class="d-block w-100">
-                        </div>
-                        <div class="carousel-item">
-                        <img src="img/apiarios/ap2.jpg" alt="Apiario 2" class="d-block w-100">
-                        </div>
-                        <div class="carousel-item">
-                        <img src="img/apiarios/ap3.jpg" alt="Apiario 3" class="d-block w-100">
-                        </div>
-                    </div>
-
-                    <!-- Left and right controls/icons -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="irAlCheckout()">
+                            Iniciar Compra
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="vaciarCarrito()">
+                            Vaciar Carrito
+                        </button>
                     </div>
                 </div>
             </div>
-       </div>
-
+        </div>
+        
         <!--Footer-->
         <div class="container-fluid bg-dark">
             <div class="row">
@@ -178,5 +160,72 @@
                 </div>
             </div>
         </div>
+        <!-- logica para la carga de info de los productos -->
+        <script>
+            function formatearPrecio(valor) {
+                return '$' + valor.toLocaleString('es-CL');
+            }
+
+            function cargarDetalleProducto() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const idProducto = parseInt(urlParams.get('id')) || 1;
+
+                const prod = responseAPI.data.find(p => p.id === idProducto);
+                const contenedor = document.getElementById("vistaDetalle");
+                const migaja = document.getElementById("migajaProducto");
+
+                if (!prod) {
+                    contenedor.innerHTML = `
+                        <div class="col-12 text-center my-5">
+                            <h3>Producto no encontrado</h3>
+                            <a href="productos.php" class="btn btn-primary mt-3">Volver al catálogo</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (migaja) migaja.innerText = prod.nombre;
+
+                contenedor.innerHTML = `
+                    <!-- Imagen producto -->
+                    <div class="col-12 col-md-6 text-center">
+                        <div class="p-3 bg-white rounded shadow-sm">
+                            <img src="${prod.imagen}" alt="${prod.nombre}" class="img-fluid" style="max-height: 400px; object-fit: contain;">
+                        </div>
+                    </div>
+
+                    <!-- Info de la compra -->
+                    <div class="col-12 col-md-6">
+                        <span class="badge bg-warning text-dark text-uppercase mb-2">${prod.categoria}</span>
+                        <h1 class="display-5 fw-bold">${prod.nombre}</h1>
+                        <h2 class="text-warning fw-bold my-3">${formatearPrecio(prod.precio)}</h2>
+                        <p class="lead text-muted">${prod.descripcion}</p>
+
+                        <hr class="my-4">
+
+                        <!-- Selector de cantidad y boton de compra -->
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <label for="cantInput" class="fw-semibold">Cantidad:</label>
+                            <input type="number" id="cantInput" class="form-control text-center" value="1" min="1" max="10" style="width: 80px;">
+                            <button type="button" class="btn btn-primary btn-lg flex-grow-1" onclick="ejecutarAgregar(${prod.id})">
+                                Añadir al Carrito
+                            </button>
+                        </div>
+
+                        <div class="card bg-light border-0 p-3">
+                            <small class="text-muted">
+                                <strong>Envíos a todo Chile:</strong> Despacho asegurado y embalaje especial para productos de vidrio y miel pura.
+                            </small>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function ejecutarAgregar(id) {
+                const cantidadInput = document.getElementById('cantInput');
+                const cantidad = cantidadInput ? parseInt(cantidadInput.value) || 1 : 1;
+                agregarAlCarrito(id, cantidad);
+            }
+        </script>
     </body>
 </html>

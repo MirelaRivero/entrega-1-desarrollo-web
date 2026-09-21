@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Finalizar compra</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="estilos/estilos.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Archivo de lista compartida -->
+        <script src="js/productos.js"></script>
+        <script src="js/carrito.js"></script>
+    </head>
+
+    <body onload="cargarResumenCheckout();">
+
+        <!--Navbar -->
+        <nav class="navbar navbar-expand-sm navbar-light shadow-sm">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="index.php">
+                    <img src="img/logoap1.png" alt="Logo Apicola Dorada" style="width: 160px;" class="logo-img">
+                </a>
+                <a href="productos.php" class="btn btn-outline-secondary btn-sm">
+                    ← Seguir Comprando
+                </a>
+            </div>
+        </nav>
+
+        <!-- Contenedor principal -->
+        <div class="container my-5">
+            <h2 class="mb-4 fw-bold">Finalizar Compra</h2>
+
+            <div class="row g-5">
+                <!-- Formulario de despacho y pago -->
+                <div class="col-12 col-lg-7">
+                    <form id="formCheckout" onsubmit="procesarCompra(event)">
+                        <!-- Datos personales -->
+                        <h4 class="mb-3 text-secondary">1. Datos Personales</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-6">
+                                <label for="nombre" class="form-label">Nombre Completo *</label>
+                                <input type="text" class="form-control" id="nombre" required placeholder="Ej: Juan Pérez">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="rut" class="form-label">RUT *</label>
+                                <input type="text" class="form-control" id="rut" required placeholder="Ej: 12.345.678-9">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="email" class="form-label">Correo Electrónico *</label>
+                                <input type="email" class="form-control" id="email" required placeholder="Ej: correo@ejemplo.com">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="telefono" class="form-label">Teléfono *</label>
+                                <input type="tel" class="form-control" id="telefono" required placeholder="Ej: +56 9 1234 5678">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Direccion de envio -->
+                        <h4 class="mb-3 text-secondary">2. Dirección de Envío</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-12">
+                                <label for="direccion" class="form-label">Calle y Número *</label>
+                                <input type="text" class="form-control" id="direccion" required placeholder="Ej: Av. Providencia 1234, Depto 402">
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="region" class="form-label">Región *</label>
+                                <select class="form-select" id="region" required>
+                                    <option value="">Selecciona una Región...</option>
+                                    <option value="metropolitana" selected>Región Metropolitana</option>
+                                    <option value="valparaiso" selected>Región de Valparaíso</option>
+                                    <option value="biobio" selected>Región del BioBío</option>
+                                    <option value="loslagos" selected>Región de Los Lagos</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="comuna" class="form-label">Comuna *</label>
+                                <input type="text" class="form-control" id="comuna" required placeholder="Ej: Santiago">
+                            </div>
+                        </div>
+
+                        <!-- Simulacion de metodo de pago -->
+                        <h4 class="mb-3 text-secondary">3. Método de Pago</h4>
+                        <div class="my-3">
+                            <div class="form-check mb-2">
+                                <input id="webpay" name="metodoPago" type="radio" class="form-check-input" checked required>
+                                <label class="form-check-label fw-semibold" for="webpay">Webpay Plus (Débito / Crédito)</label>
+                            </div>
+                            <div class="form-check">
+                                <input id="transferencia" name="metodoPago" type="radio" class="form-check-input" required>
+                                <label class="form-check-label fw-semibold" for="transferencia">Transferencia</label>
+                            </div>
+                        </div>
+
+                        <button class="w-100 btn btn-primary btn-lg mt-4 py-3 fw-bold" type="submit" id="btnConfirmarPedido">
+                            Confirmar y Pagar
+                        </button>
+                    </form>
+                </div>
+                <!-- Resumen de la compra -->
+                <div class="col-12 col-lg-5">
+                    <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                        <div class="card-header bg-light py-3">
+                            <h5 class="mb-0 fw-bold">Resumen de tu Compra</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Lista dinamica de los productos comprados -->
+                            <div id="listaProductosCheckout" class="mb-3" style="max-height: 280px; overflow-y: auto;">
+                                <!-- Se llena con cargarResumenCheckout() -->
+                            </div>
+
+                            <hr>
+
+                            <!-- Desglose del costo de la compra -->
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal:</span>
+                                <span class="fw-semibold" id="checkoutSubtotal">$0</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Envío estimado:</span>
+                                <span class="fw-semibold text-success" id="checkoutEnvio">$3.500</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fs-5 fw-bold">Total a Pagar:</span>
+                                <span class="fs-4 fw-bold text-warning" id="checkoutTotalFinal">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmacion de compra -->
+         <div class="modal-fade" id="modalExitoCompra" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content text-center p-4">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <span style="font-size: 4rem;">🎉</span>
+                        </div>
+                        <h3 class="fw-bold text-success mb-2">¡Pedido Confirmado!</h3>
+                        <p class="text-muted">Gracias por tu compra en <strong>Apícola Dorada</strong>. Hemos enviado el comprobante a tu correo</p>
+                        <div class="p-3 bg-light rounded my-3">
+                            <small class="text-muted d-block">Número de seguimiento:</small>
+                            <span class="fs-5 fw-bold text-dark" id="numOrden">#AP-2026-0001</span>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary w-100 mt-3" onclick="volverAlCatalogo()">
+                            Volver a la Tienda
+                        </button>
+                    </div>
+                </div>
+            </div>
+         </div>
+
+        <!--Footer-->
+        <div class="container-fluid bg-dark">
+            <div class="row">
+                <div class="col-4"></div>
+                <div class="col-4" style="color:white"><strong>MirelaRivero@2026</strong></div>
+                <div class="col-4"></div>
+            </div>
+        </div>
+
+        <!-- Logica necesaria para el checkout -->
+        <script>
+            function formatearPrecio(valor) {
+                return '$' + valor.toLocaleString('es-CL');
+            }
+            
+            const COSTO_ENVIO = 3500;
+
+            function cargarResumenCheckout() {
+                const carrito = obtenerCarrito();
+                const contenedorLista = document.getElementById("listaProductosCheckout");
+                const subtotalTexto = document.getElementById("checkoutSubtotal");
+                const envioTexto = document.getElementById("checkoutEnvio");
+                const totalTexto = document.getElementById("checkoutTotalFinal");
+                const btnPagar = document.getElementById("btnConfirmarPedido");
+
+                // Si no hay productos en el carrito el formulario permanece bloqueado
+                if (carrito.lenght === 0) {
+                    contenedorLista.innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <p>No tienes productos en el carrito</p>
+                            <a href="productos.php" class="btn btn-sm btn-outline-primary">Ver Catálogo</a>
+                        </div>
+                    `;
+                    subtotalTexto.innerText = "$0";
+                    envioTexto.innerText = "$0";
+                    totalTexto.innerText = "$0";
+                    btnPagar.disabled = true;
+                    return;
+                }
+
+                let subtotal = 0;
+                let html = "";
+
+                carrito.forEach(item => {
+                    const itemSubtotal = item.precio * item.cantidad;
+                    subtotal += itemSubtotal;
+
+                    html += `
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <img src="${item.imagen}" alt="${item.nombre}" style="width: 45px; height: 45px; object-fit: contain;" class="rounded me-2 border">
+                                <div>
+                                    <h6 class="mb-0 fs-6 text-truncate" style="max-width: 180px;">${item.nombre}</h6>
+                                    <small class="text-muted">${item.cantidad} x ${formatearPrecio(item.precio)}</small>
+                                </div>
+                            </div>
+                            <span class="fw-semibold">${formatearPrecio(itemSubtotal)}</span>
+                        </div>
+                    `;
+                });
+
+                contenedorLista.innerHTML = html;
+                subtotalTexto.innerText = formatearPrecio(subtotal);
+                envioTexto.innerText = formatearPrecio(COSTO_ENVIO);
+                totalTexto.innerText = formatearPrecio(subtotal + COSTO_ENVIO);
+            }
+
+            function procesarCompra(event) {
+                // Evita recargar la pagina
+                event.preventDefault();
+
+                const carrito = obtenerCarrito();
+                if (carrito.lenght === 0) {
+                    alert("Tu carrito está vacío");
+                    return;
+                }
+
+                // Generamos un numero aleatorio para simular por ahora
+                const randomId = Math.floor(1000 + Math.random() * 9000);
+                document.getElementById("numOrden").innerText = `#AP-2026-${randomId}`;
+
+                // Abrimos el modal de compra exitosa
+                const modalExito = new bootstrap.Modal(document.getElementById('modalExitoCompra'));
+                modalExito.show();
+
+                // Limpiamos el carrito
+                localStorage.removeItem('carritoMiel');
+            }
+
+            function volverAlCatalogo() {
+                window.location.href = "productos.php";
+            }
+        </script>
+    </body>
+</html>
