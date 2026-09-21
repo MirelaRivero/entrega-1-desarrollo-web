@@ -7,14 +7,17 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="estilos/estilos.css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Archivo de lista compartida -->
+        <script src="js/productos.js"></script>
+        <script src="js/carrito.js"></script>
     </head>
-    <body>
+    <body onload="cargarMasVendidos();">
         <!--Estructura básica-->
         <!--Navbar -->
         <nav class="navbar navbar-expand-sm navbar-light">
             <div class="container-fluid">
                 <a class="navbar-brand" href="index.php">
-                    <img src="img/logoap.png" alt="Avatar Logo" style="width: 180px;" class="logo-img">
+                    <img src="img/logoap1.png" alt="Avatar Logo" style="width: 180px;" class="logo-img">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
                     <span class="navbar-toggler-icon"></span>
@@ -42,65 +45,64 @@
                         </li>
                     </ul>
                 </div>
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#myModal">Acceso</button>
+                <button type="button" class="btn border-0 bg-transparent p-0 position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
+                    <img src="img/carrito.png" style="width: 20px; height: 20px; object-fit: contain;">
+                    <!-- contador dinámico -->
+                    <span class="position-absolute top-0 start-100 translate-middle bagde rounded-pill bg-danger" id="contadorCarrito">
+                        0
+                    </span>
+                </button>
+
+                <button type="button" class="btn border-0 bg-transparent p-0" data-bs-toggle="modal" data-bs-target="#myModal">
+                    <img src="img/loginicon1.png" style="width: 20px; height: 20px; object-fit: contain;">
+                </button>
             </div>
         </nav>
 
         <!-- Cartas de contenido -->
         <div class="container my-5">
             <h2 class="text-center mb-4">Nuestros Productos Más Vendidos</h2>
-            <div class="row g-4">
-                <!-- Producto 1 -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 shadow-sm">
-                            <img src="img/mieles/miel1.png" class="card-img-top" alt="Miel 1">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Miel 1</h5>
-                                <p class="card-text">Descripción de la miel 1.</p>
-                                <a href="#" class="btn btn-primary mt-auto">Ver Detalles</a>
-                            </div>
-                        </div>
-                </div>
-                <!-- Producto 2 -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 shadow-sm">
-                            <img src="img/mieles/miel2.png" class="card-img-top" alt="Miel 2">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Miel 2</h5>
-                                <p class="card-text">Descripción de la miel 2.</p>
-                                <a href="#" class="btn btn-primary mt-auto">Ver Detalles</a>
-                            </div>
-                        </div>
-                </div>
-                <!-- Producto 3 -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 shadow-sm">
-                            <img src="img/mieles/miel3.png" class="card-img-top" alt="Miel 3">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Miel 3</h5>
-                                <p class="card-text">Descripción de la miel 3.</p>
-                                <a href="#" class="btn btn-primary mt-auto">Ver Detalles</a>
-                            </div>
-                        </div>
-                </div>
-                <!-- Producto 4 -->
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="card h-100 shadow-sm">
-                            <img src="img/mieles/miel4.png" class="card-img-top" alt="Miel 4">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">Miel 4</h5>
-                                <p class="card-text">Descripción de la miel 4.</p>
-                                <a href="#" class="btn btn-primary mt-auto">Ver Detalles</a>
-                            </div>
-                        </div>
-                </div>
-                <!-- Boton de ver más -->
-                <div class="col-12 text-center mt-4">
-                    <a href="productos.php" class="btn btn-primary">Ver Más Productos</a>
-                </div>
 
+            <!-- Contenedor de productos mas vendidos dinamico -->
+            <div class="row g-4" id="contenedorMasVendidos"></div>
+                
+            <!-- Boton de ver más -->
+            <div class="col-12 text-center mt-4">
+                <a href="productos.php" class="btn btn-primary">Ver Más Productos</a>
             </div>
+
         </div>
+        
+        <script>
+            function cargarMasVendidos() {
+                const contenedor = document.getElementById("contenedorMasVendidos");
+
+                // Busco los primeros 4 elementos más vendidos 
+                const masVendidos = responseAPI.data.slice(0, 4);
+
+                masVendidos.forEach(prod => {
+                    const col = document.createElement("div");
+                    col.className = "col-12 col-sm-6 col-lg-3";
+
+                    col.innerHTML =`
+                        <div class="card h-100 shadow-sm">
+                            <img src="${prod.imagen}" class="card-img-top" alt="${prod.nombre}">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${prod.nombre}</h5>
+                                <p class="card-text text-muted">${prod.descripcion}</p>
+                                <h6 class="text-warning fw-bold mb-3">${formatearPrecio(prod.precio)}</h6>
+                                <a href="detalle-producto.php?id=${prod.id}" class="btn btn-primary mt-auto">Ver Detalles</a>
+                            </div>
+                        </div>
+                    `;
+
+                    contenedor.appendChild(col);
+                });
+            }
+            function formatearPrecio(valor) {
+                return '$' + valor.toLocaleString('es-CL');
+            }
+        </script>
 
         <!-- Carousel -->
        <div class="container my-4">
@@ -199,6 +201,41 @@
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                     </div>
 
+                </div>
+            </div>
+        </div>
+        <!-- Panel lateral del carrito -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
+            <div class="offcanvas-header bg-light border-bottom">
+                <h5 class="offcanvas-title fw-bold" id="offcanvasCarritoLabel">Carrito de Compras</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+
+            <!-- Productos que se añaden -->
+            <div class="ofcanvas-body d-flex flex-column">
+                <!-- Lista de productos -->
+                <div id="listaCarrito" class="flex-grow-1 overflow-auto">
+                    <!-- si el carrito esta vacio se mostrara un mensaje -->
+                     <div class="text-center text-muted my-5" id="carritoVacio">
+                        <p class="fs-4">🍯</p>
+                        <small>Tu carrito está vacío</small>
+                     </div>
+                </div>
+
+                <!-- Contenido del carrito -->
+                <div class="border-top pt-3 mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fw-bold fs-5">Total a Pagar: </span>
+                        <span class="fw-bold fs-5 text-warning" id="precioTotalCarrito">$0</span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="irAlCheckout()">
+                            Iniciar Compra
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="vaciarCarrito()">
+                            Vaciar Carrito
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

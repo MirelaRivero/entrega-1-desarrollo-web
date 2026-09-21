@@ -7,6 +7,8 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="estilos/estilos.css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="js/productos.js"></script>
+        <script src="js/carrito.js"></script>
     </head>
     <body onload="cargarTarjetas();">
         <!--Estructura básica-->
@@ -15,7 +17,7 @@
         <nav class="navbar navbar-expand-sm navbar-light">
             <div class="container-fluid">
                 <a class="navbar-brand" href="index.php">
-                    <img src="img/logoap.png" alt="Avatar Logo" style="width: 180px;" class="logo-img">
+                    <img src="img/logoap1.png" alt="Avatar Logo" style="width: 180px;" class="logo-img">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
                     <span class="navbar-toggler-icon"></span>
@@ -43,7 +45,16 @@
                         </li>
                     </ul>
                 </div>
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#myModal">Acceso</button>
+                <button type="button" class="btn border-0 bg-transparent p-0 position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
+                    <img src="img/carrito.png" style="width: 20px; height: 20px; object-fit: contain;">
+                    <!-- contador dinámico -->
+                    <span class="position-absolute top-0 start-100 translate-middle bagde rounded-pill bg-danger" id="contadorCarrito">
+                        0
+                    </span>
+                </button>
+                <button type="button" class="btn border-0 bg-transparent p-0" data-bs-toggle="modal" data-bs-target="#myModal">
+                    <img src="img/loginicon1.png" style="width: 20px; height: 20px; object-fit: contain;">
+                </button>
             </div>
         </nav>
         <!--Conteiner -->
@@ -54,72 +65,6 @@
         </div>
 
         <script>
-            const responseAPI = {
-                "status": 200,
-                "message": "Productos obtenidos exitosamente",
-                "data": [
-                    // MIELES
-                    {
-                    "id": 1,
-                    "nombre": "Miel de Ulmo",
-                    "categoria": "mieles",
-                    "precio": "$6.500",
-                    "descripcion": "Aroma floral pronunciado y textura cremosa única.",
-                    "imagen": "img/mieles/miel1.png"
-                    },
-                    {
-                    "id": 2,
-                    "nombre": "Miel Multifloral",
-                    "categoria": "mieles",
-                    "precio": "$5.900",
-                    "descripcion": "Proveniente del bosque nativo, suave y balanceada.",
-                    "imagen": "img/mieles/miel2.png"
-                    },
-                    {
-                    "id": 3,
-                    "nombre": "Miel de Quillay",
-                    "categoria": "mieles",
-                    "precio": "$6.200",
-                    "descripcion": "Sabor ambarino intenso, ideal para endulzar infusiones.",
-                    "imagen": "img/mieles/miel3.png"
-                    },
-                    {
-                    "id": 4,
-                    "nombre": "Miel de Propóleo",
-                    "categoria": "mieles",
-                    "precio": "$7.000",
-                    "descripcion": "Concentrado natural con propiedades antibacterianas.",
-                    "imagen": "img/mieles/miel4.png"
-                    },
-                    //PACKS
-                    {
-                    "id": 5,
-                    "nombre": "Pack Degustación 3 Mieles",
-                    "categoria": "packs",
-                    "precio": "$15.990",
-                    "descripcion": "Incluye frascos de Multiforal, Quillay y Propóleo.",
-                    "imagen": "img/packs/pack1.png"
-                    },
-                    // Derivados
-                    {
-                    "id": 6,
-                    "nombre": "Propóleo en Gotas 30ml",
-                    "categoria": "derivados",
-                    "precio": "$4.500",
-                    "descripcion": "Tintura de propóleo natural para reforzar defensas.",
-                    "imagen": "img/derivados/propo1.png"
-                    },
-                    {
-                    "id": 7,
-                    "nombre": "Polen Granulado 250g",
-                    "categoria": "derivados",
-                    "precio": "$5.200",
-                    "descripcion": "Superalimento energizantes cosechado artesanalmente.",
-                    "imagen": "img/derivados/polen1.png"
-                    }
-                ]
-            };
-
             function cargarTarjetas() {
                 const contenedor = document.getElementById("contenedorProductos");
                 contenedor.innerHTML = "";
@@ -158,14 +103,21 @@
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">${prod.nombre}</h5>
                                 <p class="card-text text-muted">${prod.descripcion}</p>
-                                <h6 class="text-warning fw-bold mb-3">${prod.precio}</h6>
-                                <a href="detalle-producto.php?id=${prod.id}" class="btn btn-primary mt-auto">Ver Detalles</a>
+                                <h6 class="text-warning fw-bold mb-3">${formatearPrecio(prod.precio)}</h6>
+                                <div class="d-flex gap-2 mt-auto">
+                                    <a href="detalle-producto.php?id=${prod.id}" class="btn btn-outline-secondary w-50">Ver Detalles</a>
+                                    <button type="button" class="btn btn-primary w-50" onclick="agregarAlCarrito(${prod.id})">Añadir </button>
+                                </div>
                             </div>
                         </div>
                     `;
 
                     contenedor.appendChild(col);
                 });
+            }
+
+            function formatearPrecio(valor) {
+                return '$' + valor.toLocaleString('es-CL');
             }
         </script>
 
@@ -213,6 +165,40 @@
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                     </div>
 
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
+            <div class="offcanvas-header bg-light border-bottom">
+                <h5 class="offcanvas-title fw-bold" id="offcanvasCarritoLabel">Carrito de Compras</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+
+            <!-- Productos que se añaden -->
+            <div class="ofcanvas-body d-flex flex-column">
+                <!-- Lista de productos -->
+                <div id="listaCarrito" class="flex-grow-1 overflow-auto">
+                    <!-- si el carrito esta vacio se mostrara un mensaje -->
+                     <div class="text-center text-muted my-5" id="carritoVacio">
+                        <p class="fs-4">🍯</p>
+                        <small>Tu carrito está vacío</small>
+                     </div>
+                </div>
+
+                <!-- Contenido del carrito -->
+                <div class="border-top pt-3 mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="fw-bold fs-5">Total a Pagar: </span>
+                        <span class="fw-bold fs-5 text-warning" id="precioTotalCarrito">$0</span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="irAlCheckout()">
+                            Iniciar Compra
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="vaciarCarrito()">
+                            Vaciar Carrito
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -59,6 +59,15 @@
     color: #ffffff;
 }
 
+.navbar button.bg-transparent img {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.navbar button.bg-transparent:hover img {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
 /*Altura para todas las imagenes de tarjetas*/
 .card-img-top {
     height: 220px;
