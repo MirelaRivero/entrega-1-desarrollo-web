@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Página Principal</title>
+        <title>Catálogo de Miel</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="estilos/estilos.css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Archivo de lista compartida -->
         <script src="js/productos.js"></script>
         <script src="js/carrito.js"></script>
+        <script src="js/validaciones.js"></script>
     </head>
-    <body onload="cargarMasVendidos();">
+    <body onload="cargarTarjetas();">
         <!--Estructura básica-->
+        
         <!--Navbar -->
         <nav class="navbar navbar-expand-sm navbar-light">
             <div class="container-fluid">
-                <a class="navbar-brand" href="index.php">
+                <a class="navbar-brand" href="index.html">
                     <img src="img/logoap1.png" alt="Avatar Logo" style="width: 180px;" class="logo-img">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
@@ -27,21 +28,21 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Productos</a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="productos.php?categoria=mieles">Mieles</a></li>
-                                <li><a class="dropdown-item" href="productos.php?categoria=packs">Packs</a></li>
-                                <li><a class="dropdown-item" href="productos.php?categoria=derivados">Derivados</a></li>
+                                <li><a class="dropdown-item" href="productos.html?categoria=mieles">Mieles</a></li>
+                                <li><a class="dropdown-item" href="productos.html?categoria=packs">Packs</a></li>
+                                <li><a class="dropdown-item" href="productos.html?categoria=derivados">Derivados</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="productos.php?">Todo</a></li>
+                                <li><a class="dropdown-item" href="productos.html?">Todo</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="tiendas.php">Tiendas</a>
+                            <a class="nav-link" href="tiendas.html">Tiendas</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="empresa.php">Quienes Somos</a>
+                            <a class="nav-link" href="empresa.html">Quienes Somos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="contacto.php">Contacto</a>
+                            <a class="nav-link" href="contacto.html">Contacto</a>
                         </li>
                     </ul>
                 </div>
@@ -60,29 +61,43 @@
                 </div>
             </div>
         </nav>
+        <!--Conteiner -->
 
-        <!-- Cartas de contenido -->
         <div class="container my-5">
-            <h2 class="text-center mb-4">Nuestros Productos Más Vendidos</h2>
-
-            <!-- Contenedor de productos mas vendidos dinamico -->
-            <div class="row g-4" id="contenedorMasVendidos"></div>
-                
-            <!-- Boton de ver más -->
-            <div class="col-12 text-center mt-4">
-                <a href="productos.php" class="btn btn-primary">Ver Más Productos</a>
-            </div>
-
+            <h2 class="text-center mb-4">Nuestros Productos</h2>
+            <div class="row g-4" id="contenedorProductos"></div>
         </div>
-        
+
         <script>
-            function cargarMasVendidos() {
-                const contenedor = document.getElementById("contenedorMasVendidos");
+            function cargarTarjetas() {
+                const contenedor = document.getElementById("contenedorProductos");
+                contenedor.innerHTML = "";
+                
+                // Leemos el parametro de categoria
+                const urlParams = new URLSearchParams(window.location.search);
+                const catSeleccionada = urlParams.get('categoria') || 'todos';
 
-                // Busco los primeros 4 elementos más vendidos 
-                const masVendidos = responseAPI.data.slice(0, 4);
+                // Cambiamos el titulo de la pagina
+                const titulo = document.querySelector("h2.text-center");
+                if (titulo) {
+                    if (catSeleccionada === "mieles") titulo.innerText = "Nuestras Mieles";
+                    else if (catSeleccionada === "packs") titulo.innerText = "Packs Promocionales";
+                    else if (catSeleccionada === "derivados") titulo.innerText = "Derivados de la Miel";
+                    else titulo.innerText = "Todos Nuestros Productos";
+                }
 
-                masVendidos.forEach(prod => {
+                // Filtramos los productos por categoria
+                const productosFiltrados = (catSeleccionada === 'todos')
+                    ? responseAPI.data
+                    : responseAPI.data.filter(p => p.categoria === catSeleccionada);
+
+                // Renderizar las tarjetas filtradas
+                if (productosFiltrados.length === 0) {
+                    contenedor.innerHTML = '<div class="col-12 text-center text-muted"><p>No hay productos disponibles para esta sección por el momento.<p></div>';
+                    return;
+                }
+
+                productosFiltrados.forEach(prod => {
                     const col = document.createElement("div");
                     col.className = "col-12 col-sm-6 col-lg-3";
 
@@ -93,7 +108,10 @@
                                 <h5 class="card-title">${prod.nombre}</h5>
                                 <p class="card-text text-muted">${prod.descripcion}</p>
                                 <h6 class="text-warning fw-bold mb-3">${formatearPrecio(prod.precio)}</h6>
-                                <a href="detalle-producto.php?id=${prod.id}" class="btn btn-primary mt-auto">Ver Detalles</a>
+                                <div class="d-flex gap-2 mt-auto">
+                                    <a href="detalle-producto.html?id=${prod.id}" class="btn btn-outline-secondary w-50">Ver Detalles</a>
+                                    <button type="button" class="btn btn-primary w-50" onclick="agregarAlCarrito(${prod.id})">Añadir </button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -101,72 +119,21 @@
                     contenedor.appendChild(col);
                 });
             }
+
             function formatearPrecio(valor) {
                 return '$' + valor.toLocaleString('es-CL');
             }
         </script>
 
-        <!-- Carousel -->
-       <div class="container my-4">
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-12 col-lg-10">
-                    <h2 class="text-center mb-4">Conoce sobre nuestros Apiarios</h2>
-                    </h2>
-                    <div id="demo" class="carousel slide" data-bs-ride="carousel">
-
-                    <!-- Indicators/dots -->
-                    <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-                        <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-                        <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
-                    </div>
-
-                    <!-- The slideshow/carousel -->
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                        <img src="img/apiarios/ap1.jpg" alt="Apiario 1" class="d-block w-100">
-                        </div>
-                        <div class="carousel-item">
-                        <img src="img/apiarios/ap2.jpg" alt="Apiario 2" class="d-block w-100">
-                        </div>
-                        <div class="carousel-item">
-                        <img src="img/apiarios/ap3.jpg" alt="Apiario 3" class="d-block w-100">
-                        </div>
-                    </div>
-
-                    <!-- Left and right controls/icons -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
-                    </div>
-                </div>
-            </div>
-       </div>
-
-       <!-- Contenido adicional -->
-       <div class="container my-5">
-            <div class="row">
-                <div class="col-12 col-md-6">
-                    <h2>Sobre Nosotros</h2>
-                    <p>Somos una empresa dedicada a la producción y comercialización de miel de alta calidad. Nuestro compromiso es ofrecer productos naturales y saludables, provenientes de nuestros propios apiarios.</p>
-                </div>
-                <div class="col-12 col-md-6">
-                    <img src="img/nosotros.jpg" class="img-fluid" alt="Sobre Nosotros">
-                </div>
-            </div>
-        </div>
-
         <!--Footer-->
-        <div class="container-fluid bg-dark">
+        <footer class="container-fluid bg-dark">
             <div class="row">
                 <div class="col-4"></div>
                 <div class="col-4" style="color:white"><strong>MirelaRivero@2026</strong></div>
                 <div class="col-4"></div>
             </div>
-        </div>
+        </footer>
+
         <!-- Modal -->
         <div class="modal" id="myModal">
             <div class="modal-dialog">
@@ -180,7 +147,7 @@
 
                     <!-- Modal body -->
                     <div class="modal-body">
-                        <form action="/action_page.php">
+                        <form action="/action_page.html">
                             <div class="mb-3 mt-3">
                                 <label for="email" class="form-label">Email:</label>
                                 <input type="email" class="form-control" id="email" placeholder="Ingresa tu email" name="email">
@@ -206,7 +173,6 @@
                 </div>
             </div>
         </div>
-        <!-- Panel lateral del carrito -->
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
             <div class="offcanvas-header bg-light border-bottom">
                 <h5 class="offcanvas-title fw-bold" id="offcanvasCarritoLabel">Carrito de Compras</h5>

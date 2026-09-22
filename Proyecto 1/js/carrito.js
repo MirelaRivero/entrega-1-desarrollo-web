@@ -1,3 +1,18 @@
+// Utilidades de precio
+function parsearPrecio(valor) {
+    if (typeof valor === 'number') return valor;
+    if (typeof valor === 'string') {
+        const limpio = valor.replace(/\D/g, '');
+        return parseInt(limpio, 10) || 0;
+    }
+    return 0;
+}
+
+function formatearPrecio(valor) {
+    const numero = parsearPrecio(valor);
+    return '$'+ numero.toLocaleString('es-CL');
+}
+
 // Obtener productos guardados
 function obtenerCarrito() {
     const carritoGuardado = localStorage.getItem('carritoMiel');
@@ -130,7 +145,7 @@ function irAlCheckout() {
         alert("Agrega al menos un producto al carrito antes de continuar.");
         return;
     }
-    window.location.href="checkout.php";
+    window.location.href="checkout.html";
 }
 // Listener para inicializar el carrito apenas se carguen las paginas
 document.addEventListener('DOMContentLoaded', actualizarVistaCarrito);

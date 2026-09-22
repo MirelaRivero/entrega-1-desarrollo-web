@@ -10,6 +10,7 @@
         <!-- Archivo de lista compartida -->
         <script src="js/productos.js"></script>
         <script src="js/carrito.js"></script>
+        <script src="js/validaciones.js"></script>
     </head>
 
     <body onload="cargarResumenCheckout();">
@@ -17,10 +18,10 @@
         <!--Navbar -->
         <nav class="navbar navbar-expand-sm navbar-light shadow-sm">
             <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="index.php">
+                <a class="navbar-brand d-flex align-items-center" href="index.html">
                     <img src="img/logoap1.png" alt="Logo Apicola Dorada" style="width: 160px;" class="logo-img">
                 </a>
-                <a href="productos.php" class="btn btn-outline-secondary btn-sm">
+                <a href="productos.html" class="btn btn-outline-secondary btn-sm">
                     ← Seguir Comprando
                 </a>
             </div>
@@ -33,25 +34,29 @@
             <div class="row g-5">
                 <!-- Formulario de despacho y pago -->
                 <div class="col-12 col-lg-7">
-                    <form id="formCheckout" onsubmit="procesarCompra(event)">
+                    <form id="formCheckout" onsubmit="procesarCompra(event)" novalidate>
                         <!-- Datos personales -->
                         <h4 class="mb-3 text-secondary">1. Datos Personales</h4>
                         <div class="row g-3 mb-4">
                             <div class="col-sm-6">
                                 <label for="nombre" class="form-label">Nombre Completo *</label>
                                 <input type="text" class="form-control" id="nombre" required placeholder="Ej: Juan Pérez">
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="rut" class="form-label">RUT *</label>
                                 <input type="text" class="form-control" id="rut" required placeholder="Ej: 12.345.678-9">
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="email" class="form-label">Correo Electrónico *</label>
                                 <input type="email" class="form-control" id="email" required placeholder="Ej: correo@ejemplo.com">
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="telefono" class="form-label">Teléfono *</label>
                                 <input type="tel" class="form-control" id="telefono" required placeholder="Ej: +56 9 1234 5678">
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
 
@@ -63,6 +68,7 @@
                             <div class="col-12">
                                 <label for="direccion" class="form-label">Calle y Número *</label>
                                 <input type="text" class="form-control" id="direccion" required placeholder="Ej: Av. Providencia 1234, Depto 402">
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="region" class="form-label">Región *</label>
@@ -73,10 +79,12 @@
                                     <option value="biobio" selected>Región del BioBío</option>
                                     <option value="loslagos" selected>Región de Los Lagos</option>
                                 </select>
+                                <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="comuna" class="form-label">Comuna *</label>
                                 <input type="text" class="form-control" id="comuna" required placeholder="Ej: Santiago">
+                                <div class="invalid-feedback"></div>
                             </div>
                         </div>
 
@@ -155,13 +163,13 @@
          </div>
 
         <!--Footer-->
-        <div class="container-fluid bg-dark">
+        <footer class="container-fluid bg-dark">
             <div class="row">
                 <div class="col-4"></div>
                 <div class="col-4" style="color:white"><strong>MirelaRivero@2026</strong></div>
                 <div class="col-4"></div>
             </div>
-        </div>
+        </footer>
 
         <!-- Logica necesaria para el checkout -->
         <script>
@@ -184,7 +192,7 @@
                     contenedorLista.innerHTML = `
                         <div class="text-center text-muted py-4">
                             <p>No tienes productos en el carrito</p>
-                            <a href="productos.php" class="btn btn-sm btn-outline-primary">Ver Catálogo</a>
+                            <a href="productos.html" class="btn btn-sm btn-outline-primary">Ver Catálogo</a>
                         </div>
                     `;
                     subtotalTexto.innerText = "$0";
@@ -225,6 +233,12 @@
                 // Evita recargar la pagina
                 event.preventDefault();
 
+                // Ejecutar validaciones
+                const esValido = validarFormularioCheckout();
+                if (!esValido) {
+                    return;
+                }
+
                 const carrito = obtenerCarrito();
                 if (carrito.lenght === 0) {
                     alert("Tu carrito está vacío");
@@ -244,7 +258,7 @@
             }
 
             function volverAlCatalogo() {
-                window.location.href = "productos.php";
+                window.location.href = "productos.html";
             }
         </script>
     </body>

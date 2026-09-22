@@ -57,7 +57,7 @@ const responseAPI = {
                     "precio": 4500,
                     "descripcion": "Tintura de propóleo natural para reforzar defensas.",
                     "imagen": "img/derivados/propo1.png",
-                    "destacado": false,
+                    "destacado": false
                     },
                     {
                     "id": 7,
