@@ -2,7 +2,7 @@
 function validarRut(rutCompleto) {
     // Limpiar puntos y guiones
     let valor = rutCompleto.replace(/\./g, '').replace(/-/g, '').trim().toUpperCase();
-    if (valor.lenght < 8 || valor.lenght > 9) return false;
+    if (valor.length < 8 || valor.length > 9) return false;
 
     let cuerpo = valor.slice(0, -1);
     let dv = valor.slice(-1);
@@ -66,7 +66,7 @@ function validarFormularioCheckout() {
     const comuna = document.getElementById('comuna');
 
     // Validacion nombre
-    if (nombre.value.trim().lenght < 3) {
+    if (nombre.value.trim().length < 3) {
         marcarCampo(nombre, false, "Por favor, ingresa tu nombre completo.");
         formularioValido = false;
     } else {
@@ -98,7 +98,7 @@ function validarFormularioCheckout() {
     }
 
     // Validacion direccion
-    if (direccion.value.trim().lenght < 5) {
+    if (direccion.value.trim().length < 5) {
         marcarCampo(direccion, false, "Ingresa una dirección completa (calle y número)");
         formularioValido = false;
     } else {
@@ -114,7 +114,7 @@ function validarFormularioCheckout() {
     }
 
     // Validacion comuna
-    if (comuna.value.trim().lenght < 3) {
+    if (comuna.value.trim().length < 3) {
         marcarCampo(comuna, false, "Ingresa tu comuna.");
         formularioValido = false;
     } else {
