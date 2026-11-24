@@ -2,26 +2,11 @@ import os
 import secrets
 import httpx
 from typing import Optional
-
-from fastapi import (
-    FastAPI,
-    Depends,
-    HTTPException,
-    Request,
-    Response
-)
-
+from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from fastapi.security import (
-    HTTPBearer,
-    HTTPAuthorizationCredentials
-)
-
-app = FastAPI(
-    title="Local API Gateway - Apícola Dorada",
-    description="Gateway de seguridad, enrutamiento proxy e introspeccion de tokens"
-)
+app = FastAPI(title="Local API Gateway - Apícola Dorada")
 
 # Configuracion de cors
 app.add_middleware(
@@ -39,7 +24,7 @@ AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL", "http://127.0.0.1:9001")
 INVENTORY_SERVICE_URL = os.getenv("INVENTORY_SERVICE_URL", "http://127.0.0.1:9002")
 ORDERS_SERVICE_URL = os.getenv("ORDERS_SERVICE_URL", "http://127.0.0.1:9003")
 
-VAULT_ADDR = os.getenv("VAULT_ADDR", "http://127.0.0.1:8200")
+VAULT_ADDR = os.getenv("VAULT_ADDR", "http://vault:8200")
 VAULT_TOKEN = os.getenv("VAULT_TOKEN", None)
 
 # Secretos de respaldo local
@@ -48,6 +33,7 @@ LOCAL_BACKEND_SECRET = os.getenv("BACKEND_SHARED_SECRET", "sc-backend-secret-202
 
 # obtenemos los secretos desde hashicorp
 async def get_gateway_secrets():
+    print("[API GATEWAY] Consultando secretos en Secret Manager (Vault)...", flush=True)
     if VAULT_TOKEN:
         url = f"{VAULT_ADDR}/v1/secret/data/gateway"
         headers = {"X-Vault-Token": VAULT_TOKEN}
@@ -55,15 +41,17 @@ async def get_gateway_secrets():
             async with httpx.AsyncClient(timeout=3.0) as client:
                 response = await client.get(url, headers=headers)
             if response.status_code == 200:
+                print("[API GATEWAY] Secretos obtenidos exitosamente desde HashiCorp Vault", flush=True)
                 vault_data = response.json()["data"]["data"]
                 return {
                     "auth_introspection_secret": vault_data.get("auth_introspection_secret", LOCAL_INTROSPECTION_SECRET),
                     "backend_shared_secret": vault_data.get("backend_shared_secret", LOCAL_BACKEND_SECRET)
                 }
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"[API GATEWAY] Vault no disponible ({e}), usando respaldo local.", flush=True)
 
     # Respaldo si Vault no está activo
+    print("[API GATEWAY] Secretos cargados desde configuración segura local", flush=True)
     return {
         "auth_introspection_secret": LOCAL_INTROSPECTION_SECRET,
         "backend_shared_secret": LOCAL_BACKEND_SECRET
@@ -74,6 +62,7 @@ async def authenticate_client(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ):
     if credentials is None:
+        print("[API GATEWAY] Rechazado, no se recibió el Bearer Token", flush=True)
         raise HTTPException(
             status_code=401,
             detail="Bearer token requerido"
@@ -82,6 +71,7 @@ async def authenticate_client(
     gateway_secrets = await get_gateway_secrets()
     introspection_secret = gateway_secrets["auth_introspection_secret"]
 
+    print(f"[API GATEWAY] Solicitando introspección de token al Auth Service ({AUTH_SERVICE_URL}/introspect)...", flush=True)
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.post(
@@ -90,7 +80,8 @@ async def authenticate_client(
                 headers={"X-Gateway-Auth-Secret": introspection_secret}
             )
 
-    except httpx.RequestError:
+    except httpx.RequestError as e:
+        print(f"[API GATEWAY] Error conectando con Auth Service: {e}", flush=True)
         raise HTTPException(
             status_code=502,
             detail="Error consultando Authentication Service"
@@ -98,16 +89,19 @@ async def authenticate_client(
 
     identity = response.json()
     if not identity.get("active", False):
+        print("[API GATEWAY] Auth Service indicó token INVÁLIDO o expirado.", flush=True)
         raise HTTPException(
             status_code=401,
             detail="Token inválido o expirado"
         )
 
+    print(f"[API GATEWAY] Token VALIDADO por Auth Service para usuario: {identity.get('username')}", flush=True)
     return {
         "user_id": identity.get("user_id"),
         "username": identity.get("username"),
         "roles": identity.get("roles", ["user"]),
-        "backend_secret": gateway_secrets["backend_shared_secret"]
+        "backend_secret": gateway_secrets["backend_shared_secret"],
+        "introspection_secret": introspection_secret
     }
 
 # Rutas que no requieren autenticacion (publicas)
@@ -125,24 +119,27 @@ def read_root():
     return {"status": "OK", "service": "API Gateway (FastAPI)"}
 
 # Enrutador proxy protegudo para el resto de rutas
-@app.api_route(
-    "/api/v1/{service}/{path:path}",
-    methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-    # operation_id="dynamic_gateway_proxy"
-)
+@app.api_route("/api/v1/{service}/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
 async def proxy(
     service: str,
     path: str,
     request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ):
-    if request.method == "GET" and service == "inventory" and path.startswith("products"):
+    print(f"\n[API GATEWAY] Petición entrante: {request.method} /api/v1/{service}/{path}", flush=True)
+
+    # Catalogo get y login
+    es_catalogo_publico = (request.method == "GET" and service == "inventory" and path.startswith("products"))
+    es_auth_publico = (service == "auth" and path in ["login", "register", "register-test"])
+
+    if es_catalogo_publico or es_auth_publico:
         secrets_data = await get_gateway_secrets()
         auth = {
             "user_id": "guest",
             "username": "guest",
             "roles": ["guest"],
-            "backend_secret": secrets_data["backend_shared_secret"]
+            "backend_secret": secrets_data["backend_shared_secret"],
+            "introspection_secret": secrets_data["auth_introspection_secret"]
         }
     else:
         auth = await authenticate_client(credentials)
@@ -158,18 +155,29 @@ async def proxy(
         raise HTTPException(status_code=404, detail="Servicio no encontrado")
 
     body = await request.body() if request.method not in ["GET", "HEAD"] else None
+    roles_raw = auth.get("roles", ["user"])
+    roles_str = ",".join(str(r) for r in roles_raw) if isinstance(roles_raw, list) else str(roles_raw)
+    # roles_str = ",".join(auth["roles"]) if isinstance(auth["roles"], list) else str(auth["roles"])
 
-    roles_str = ",".join(auth["roles"]) if isinstance(auth["roles"], list) else str(auth["roles"])
+
+    '''headers = {
+        "X-Gateway-Secret": auth["backend_secret"],
+        "X-Gateway-Auth-Secret": auth["introspection_secret"],
+        "X-Authenticated-User": auth["username"],
+        "X-Authenticated-Roles": roles_str
+    }'''
 
     headers = {
-        "X-Gateway-Secret": auth["backend_secret"],
-        "X-Authenticated-User": auth["username"],
+        "X-Gateway-Secret": auth.get("backend_secret", LOCAL_BACKEND_SECRET),
+        "X-Gateway-Auth-Secret": auth.get("introspection_secret", LOCAL_INTROSPECTION_SECRET),
+        "X-Authenticated-User": str(auth.get("username", "user")),
         "X-Authenticated-Roles": roles_str
     }
 
     if request.headers.get("content-type") and body:
         headers["content-type"] = request.headers.get("content-type")
 
+    print(f"[API GATEWAY] Enrutando llamada hacia {target_url} con secretos inyectados.", flush=True)
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             res = await client.request(
@@ -179,12 +187,14 @@ async def proxy(
                 content=body,
                 headers=headers
             )
-    except httpx.RequestError:
+    except httpx.RequestError as e:
+        print(f"[API GATEWAY] Error enrutando a {target_url}: {e}", flush=True)
         raise HTTPException(
             status_code=502,
             detail="Microservicio no disponible"
         )
 
+    print(f"[API GATEWAY] Respuesta recibida desde {service}: HTTP {res.status_code}", flush=True)
     return Response(
         content=res.content,
         status_code=res.status_code,

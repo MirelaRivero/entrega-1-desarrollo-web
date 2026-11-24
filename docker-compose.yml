@@ -1,0 +1,71 @@
+services:
+  # 5) Contenedor Persistencia
+  mongodb:
+    image: mongo:7.0
+    container_name: apicola-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # 3) Contenedor Auth Service
+  auth-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    container_name: apicola-auth
+    command: python authclients.py
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+      - AUTH_INTROSPECTION_SECRET=demo-instrospection-secret
+    ports:
+      - "9001:9001"
+    depends_on:
+      - mongodb
+
+  # 4) Contenedor Backend (Orders Service)
+  orders-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    container_name: apicola-orders
+    command: python orders.py
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+      - BACKEND_SHARED_SECRET=sc-backend-secret-2026
+    ports:
+      - "9003:9003"
+    depends_on:
+      - mongodb
+
+  # 2) Contenedor ApiGateway
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    container_name: apicola-gateway
+    command: python gateway.py
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:9001
+      - ORDERS_SERVICE_URL=http://orders-service:9003
+      - AUTH_INTROSPECTION_SECRET=demo-instrospection-secret
+      - BACKEND_SHARED_SECRET=sc-backend-secret-2026
+    ports:
+      - "9000:9000"
+    depends_on:
+      - auth-service
+      - orders-service
+
+  # 1) Contenedor Frontend (Nginx sirviendo tus HTML/JS/CSS)
+  frontend:
+    image: nginx:alpine
+    container_name: apicola-frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - api-gateway
+
+volumes:
+  mongo_data:

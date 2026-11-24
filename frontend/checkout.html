@@ -10,10 +10,10 @@
         <!-- Archivo de lista compartida -->
         <script src="js/productos.js"></script>
         <script src="js/carrito.js"></script>
-        <script src="js/validaciones.js"></script>
+        <script src="js/validaciones.js?v=2"></script>
     </head>
 
-    <body onload="cargarResumenCheckout();">
+    <body onload="cargarResumenCheckout(); actualizarEstadoSesion();">
 
         <!--Navbar -->
         <nav class="navbar navbar-expand-sm navbar-light shadow-sm">
@@ -29,6 +29,16 @@
 
         <!-- Contenedor principal -->
         <div class="container my-5">
+            <div class="alert alert-warning d-flex flex-wrap justify-content-between align-items-center mb-4" id="barraSesion">
+                <div>
+                    <strong>Estado de Sesión (Auth Service):</strong>
+                    <span id="textoEstadoSesion" class="badge bg-danger ms-2">No autenticado</span>
+                </div>
+                <button type="button" class="btn btn-sm btn-dark" onclick="iniciarSesionDemo()">
+                    Iniciar Sesión Cliente (API Gateway)
+                </button>
+            </div>
+
             <h2 class="mb-4 fw-bold">Finalizar Compra</h2>
 
             <div class="row g-5">
@@ -40,22 +50,22 @@
                         <div class="row g-3 mb-4">
                             <div class="col-sm-6">
                                 <label for="nombre" class="form-label">Nombre Completo *</label>
-                                <input type="text" class="form-control" id="nombre" required placeholder="Ej: Juan Pérez">
+                                <input type="text" class="form-control" id="nombre" required value="Cliente Test">
                                 <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="rut" class="form-label">RUT *</label>
-                                <input type="text" class="form-control" id="rut" required placeholder="Ej: 12.345.678-9">
+                                <input type="text" class="form-control" id="rut" required value="12.345.678-9">
                                 <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="email" class="form-label">Correo Electrónico *</label>
-                                <input type="email" class="form-control" id="email" required placeholder="Ej: correo@ejemplo.com">
+                                <input type="email" class="form-control" id="email" required value="correo@ejemplo.com">
                                 <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="telefono" class="form-label">Teléfono *</label>
-                                <input type="tel" class="form-control" id="telefono" required placeholder="Ej: +56 9 1234 5678">
+                                <input type="tel" class="form-control" id="telefono" required value="+56912345678">
                                 <div class="invalid-feedback"></div>
                             </div>
                         </div>
@@ -67,7 +77,7 @@
                         <div class="row g-3 mb-4">
                             <div class="col-12">
                                 <label for="direccion" class="form-label">Calle y Número *</label>
-                                <input type="text" class="form-control" id="direccion" required placeholder="Ej: Av. Providencia 1234, Depto 402">
+                                <input type="text" class="form-control" id="direccion" required value="Av. Providencia 1234">
                                 <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
@@ -75,15 +85,15 @@
                                 <select class="form-select" id="region" required>
                                     <option value="">Selecciona una Región...</option>
                                     <option value="metropolitana" selected>Región Metropolitana</option>
-                                    <option value="valparaiso" selected>Región de Valparaíso</option>
-                                    <option value="biobio" selected>Región del BioBío</option>
-                                    <option value="loslagos" selected>Región de Los Lagos</option>
+                                    <option value="valparaiso">Región de Valparaíso</option>
+                                    <option value="biobio">Región del BioBío</option>
+                                    <option value="loslagos">Región de Los Lagos</option>
                                 </select>
                                 <div class="invalid-feedback"></div>
                             </div>
                             <div class="col-sm-6">
                                 <label for="comuna" class="form-label">Comuna *</label>
-                                <input type="text" class="form-control" id="comuna" required placeholder="Ej: Santiago">
+                                <input type="text" class="form-control" id="comuna" required value="Santiago">
                                 <div class="invalid-feedback"></div>
                             </div>
                         </div>
@@ -117,9 +127,7 @@
                             <div id="listaProductosCheckout" class="mb-3" style="max-height: 280px; overflow-y: auto;">
                                 <!-- Se llena con cargarResumenCheckout() -->
                             </div>
-
                             <hr>
-
                             <!-- Desglose del costo de la compra -->
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Subtotal:</span>
@@ -149,7 +157,7 @@
                             <span style="font-size: 4rem;">🎉</span>
                         </div>
                         <h3 class="fw-bold text-success mb-2">¡Pedido Confirmado!</h3>
-                        <p class="text-muted">Gracias por tu compra en <strong>Apícola Dorada</strong>. Hemos enviado el comprobante a tu correo</p>
+                        <p class="text-muted">Gracias por tu compra en <strong>Apícola Dorada</strong> Tu pedido fue validado por el API Gateway y persistido en MongoDB</p>
                         <div class="p-3 bg-light rounded my-3">
                             <small class="text-muted d-block">Número de seguimiento:</small>
                             <span class="fs-5 fw-bold text-dark" id="numOrden">#AP-2026-0001</span>
@@ -173,11 +181,53 @@
 
         <!-- Logica necesaria para el checkout -->
         <script>
+            const API_GATEWAY_URL = "http://localhost:9000";
+            const COSTO_ENVIO = 3500;
+
             function formatearPrecio(valor) {
                 return '$' + valor.toLocaleString('es-CL');
             }
-            
-            const COSTO_ENVIO = 3500;
+
+            function actualizarEstadoSesion() {
+                const token = localStorage.getItem("apicola_token");
+                const badge = document.getElementById("textoEstadoSesion");
+                if (token) {
+                    badge.className = "badge bg-success ms-2";
+                    badge.innerText = "Autenticado (Bearer Token activo)";
+                } else {
+                    badge.className = "badge bg-danger ms-2";
+                    badge.innerText = "No autenticado";
+                }
+            }
+
+            async function iniciarSesionDemo() {
+                try {
+                    // Asegura que el usuario de prueba exista en MongoDB
+                    //await fetch(`${API_GATEWAY_URL}/api/v1/auth/register-test`);
+
+                    // Inicia sesión pasando por el API Gateway -> Auth Service
+                    const resp = await fetch(`${API_GATEWAY_URL}/api/v1/auth/login`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            username: "correo2.test@ejemplo.cl",
+                            password: "123456"
+                        })
+                    });
+
+                    const data = await resp.json();
+                    if (!resp.ok) {
+                        alert("Error iniciando sesión: " + (data.detail || "Error desconocido"));
+                        return;
+                    }
+
+                    localStorage.setItem("apicola_token", data.access_token);
+                    actualizarEstadoSesion();
+                } catch (err) {
+                    console.error(err);
+                    alert("No se pudo conectar con el API Gateway en " + API_GATEWAY_URL);
+                }
+            }
 
             function cargarResumenCheckout() {
                 const carrito = obtenerCarrito();
@@ -229,15 +279,12 @@
                 totalTexto.innerText = formatearPrecio(subtotal + COSTO_ENVIO);
             }
 
-            function procesarCompra(event) {
+            async function procesarCompra(event) {
                 // Evita recargar la pagina
                 event.preventDefault();
 
                 // Ejecutar validaciones
-                const esValido = validarFormularioCheckout();
-                if (!esValido) {
-                    return;
-                }
+                if (!validarFormularioCheckout()) return;
 
                 const carrito = obtenerCarrito();
                 if (carrito.lenght === 0) {
@@ -245,16 +292,56 @@
                     return;
                 }
 
-                // Generamos un numero aleatorio para simular por ahora
-                const randomId = Math.floor(1000 + Math.random() * 9000);
-                document.getElementById("numOrden").innerText = `#AP-2026-${randomId}`;
+                const token = localStorage.getItem("apicola_token");
+                if (!token) {
+                    alert("Primero debes iniciar sesión arriba para obtener tu Bearer Token.");
+                    return;
+                }
 
-                // Abrimos el modal de compra exitosa
-                const modalExito = new bootstrap.Modal(document.getElementById('modalExitoCompra'));
-                modalExito.show();
+                const payload = {
+                    cliente: {
+                        nombre: document.getElementById("nombre").value,
+                        rut: document.getElementById("rut").value,
+                        email: document.getElementById("email").value,
+                        telefono: document.getElementById("telefono").value
+                    },
+                    despacho: {
+                        direccion: document.getElementById("direccion").value,
+                        region: document.getElementById("region").value,
+                        comuna: document.getElementById("comuna").value
+                    },
+                    items: carrito.map(item => ({
+                        productId: item.id,
+                        nombre: item.nombre,
+                        precio: item.precio,
+                        cantidad: item.cantidad
+                    }))
+                };
 
-                // Limpiamos el carrito
-                localStorage.removeItem('carritoMiel');
+                try {
+                    const response = await fetch(`${API_GATEWAY_URL}/api/v1/orders/orders`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        alert("Error desde API Gateway: " + (result.detail || response.status));
+                        return;
+                    }
+
+                    document.getElementById("numOrden").innerText = `#${result.order.orderId}`;
+                    const modalExito = new bootstrap.Modal(document.getElementById('modalExitoCompra'));
+                    modalExito.show();
+                    localStorage.removeItem('carritoMiel');
+                } catch (error) {
+                    console.error("Error enviando pedido:", error);
+                    alert("Error de conexión con el API Gateway.");
+                }
             }
 
             function volverAlCatalogo() {

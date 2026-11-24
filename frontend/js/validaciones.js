@@ -10,6 +10,9 @@ function validarRut(rutCompleto) {
     // Validar que el cuerpo sea solo numeros
     if (!/^[0-9]+$/.test(cuerpo)) return false;
 
+    let suma = 0;
+    let multiplo = 2;
+
     for (let i = cuerpo.length - 1; i >= 0; i--) {
         suma += multiplo * parseInt(cuerpo.charAt(i));
         multiplo = multiplo < 7 ? multiplo + 1 : 2;
@@ -28,8 +31,8 @@ function validarEmail(email) {
 }
 
 // Validar telefono
-function validarTelefono() {
-    const limpio = telefono.replace(/\s+/g, '').replace(/\+/g, '');
+function validarTelefono(telefono) {
+    const limpio = String(telefono).replace(/\s+/g, '').replace(/\+/g, '');
     return /^(56)?9\d{8}$/.test(limpio);
 }
 
